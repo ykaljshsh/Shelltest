@@ -9,8 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import com.azstudio.shelltest.R;
-import com.azstudio.util.TestImageLoader;
 import com.azstudio.util.ViewHolder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 public class ImgAdapter extends BaseAdapter{
 
@@ -18,13 +19,11 @@ public class ImgAdapter extends BaseAdapter{
     private Context mContext;
     public ViewHolder holder = null;
     public String[] img_urls;
-    private TestImageLoader mImgLoader;
 
 
     public ImgAdapter(Context context, ListView listView) {
         this.mInflater = LayoutInflater.from(context);
         this.mContext = context;
-        mImgLoader = new TestImageLoader(mContext);
     }
 
     @Override
@@ -53,7 +52,12 @@ public class ImgAdapter extends BaseAdapter{
         holder = new ViewHolder();
         convertView.setTag(position);
         holder.img = (ImageView) convertView.findViewById(R.id.img);
-        mImgLoader.LoadImage(img_urls[position], holder.img);
+        //mImgLoader.LoadImage(img_urls[position], holder.img);
+        Glide.with(mContext)
+                .load(img_urls[position])
+                .placeholder(R.drawable.default_img)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.img);
 
         return convertView;
 

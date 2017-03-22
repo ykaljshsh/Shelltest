@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.azstudio.model.ShanbayWord;
 import com.azstudio.shelltest.R;
 import com.azstudio.util.Player;
 
@@ -29,6 +30,7 @@ public class QueryWordDialog {
     private TextView mWord, mPronun, mDefin;
     private ImageButton mVoice_us, mVoice_uk;
     private String[] mWordInfo = new String[8]; //{单词，英音，美音，中义，英义，英音发音url，美音发音url}
+    private ShanbayWord mShanWord = new ShanbayWord();
     private String mPlay_url_us = new String(), mPlay_url_uk = new String();
 
 
@@ -91,6 +93,22 @@ public class QueryWordDialog {
             mPronun.setText("");
             mDefin.setText("无释义");
         }
+
+    }
+
+    public void setContent(ShanbayWord content) {
+        mWord.setText(content.word);
+        if (content.status_code == 0){
+            mPronun.setText("/"+content.word_pronun_uk+"/");
+            mDefin.setText(content.word_def_cn);
+            mPlay_url_uk = content.voice_url_uk;
+            mVoice_uk.setOnClickListener(new PlayVoiceListener());
+        }
+        else {
+            mPronun.setText("");
+            mDefin.setText("无释义");
+        }
+
 
     }
 

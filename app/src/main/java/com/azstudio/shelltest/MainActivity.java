@@ -12,8 +12,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.azstudio.customwidget.MyWordView;
 import com.azstudio.customwidget.QueryWordDialog;
-import com.azstudio.customwidget.WordView;
+import com.azstudio.customwidget.ShanbayApi;
+import com.azstudio.model.ShanbayWord;
+import com.azstudio.model.WordInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +28,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements WordView.OnWordSelectListener{
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class MainActivity extends AppCompatActivity implements MyWordView.OnWordSelectListener{
 
     public String mArticle;
     private QueryWordDialog mDialog;
@@ -36,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements WordView.OnWordSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WordView mainContent = (WordView) findViewById(R.id.mainContent);
+        //WordView mainContent = (WordView) findViewById(R.id.mainContent);
+        MyWordView mainContent = (MyWordView) findViewById(R.id.mainContent);
+        //WordAlignTextView mainContent = (WordAlignTextView) findViewById(R.id.mainContent);
         mResource = getResources();
         mArticle = getFromAssets("article1.txt");
         mDialog = new QueryWordDialog(MainActivity.this);
@@ -76,7 +85,37 @@ public class MainActivity extends AppCompatActivity implements WordView.OnWordSe
     }
 
     public void popupDialog(String word){
-        new getWordInfoAsynTask().execute(word);
+        getWordInfo2(word);
+        //new getWordInfoAsynTask().execute(word);
+    }
+
+    private ShanbayWord getWordInfo2(String word){
+
+        final ShanbayWord mword = new ShanbayWord();
+        ShanbayApi api = new ShanbayApi();
+        mword.word = word;
+        Call<WordInfo> call = api.getDefault().getWordInfo(word);
+        call.enqueue(new Callback<WordInfo>() {
+            @Override
+            public void onResponse(Call<WordInfo> call, Response<WordInfo> response) {
+                //这里的response就可以提取数据了
+                mword.status_code = response.body().getStatusCode();
+                if (mword.status_code == 0){
+                    mword.word_def_cn = response.body().getData().getCnDefinition().getDefn();
+                    mword.voice_url_uk = response.body().getData().getUkAudio();
+                    mword.word_pronun_uk = response.body().getData().getPronunciation();
+                }
+                mDialog.setContent(mword);
+                mDialog.show();
+
+            }
+
+            @Override
+            public void onFailure(Call<WordInfo> call, Throwable t) {
+                // Log.e("MainActivity", t.toString());
+            }
+        });
+        return mword;
     }
 
     private String[] getWordInfo(String word){

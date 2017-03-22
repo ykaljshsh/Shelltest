@@ -9,7 +9,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.azstudio.model.ImgAdapter;
-import com.azstudio.util.TestImageLoader;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,8 +40,11 @@ public class ImgListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ImgAdapter madapter = (ImgAdapter) parent.getAdapter();
-                TestImageLoader mImgLoader = new TestImageLoader(parent.getContext());
-                mImgLoader.LoadImageByMe(madapter.getData()[position], (ImageView) view.findViewById(R.id.img));
+                Glide.with(parent.getContext())
+                        .load(madapter.getData()[position])
+                        .placeholder(R.drawable.default_img)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into((ImageView) view.findViewById(R.id.img));
             }
         });
 

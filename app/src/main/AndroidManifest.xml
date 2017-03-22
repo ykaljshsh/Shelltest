@@ -27,4 +27,6 @@
         <activity android:name=".ImgListActivity"></activity>
     </application>
 
+    <meta-data android:name="com.azstudio.shelltest.GlideCache"
+        android:value="GlideModule"/>
 </manifest>
